@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  api:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/dist
+    ports:
+      - 3000:3000
+    command: yarn start:dev
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    env_file:
+      - ./.env
+    extra_hosts:
+      # set INTERNAL_HOST=host.docker.internal in .env on linux
+      - ${INTERNAL_HOST:-INTERNAL_HOST}:host-gateway
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.db
+
+volumes:
+  postgres_data:
